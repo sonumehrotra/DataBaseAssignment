@@ -1,0 +1,1290 @@
+<html>
+      <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+        <title id="title">
+          com/knoldus/datbasestudent/Student_Subject.scala.html
+        </title>
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.20.1/css/theme.default.min.css" type="text/css"/><script src="http://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.20.1/js/jquery.tablesorter.min.js"></script><link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css" type="text/css"/><script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"></script><script type="text/javascript">
+        $(document).ready(function() {$(".tablesorter").tablesorter();});
+      </script>
+        <style>
+          table.codegrid { font-family: monospace; font-size: 12px; width: auto!important; }table.statementlist { width: auto!important; font-size: 13px; } table.codegrid td { padding: 0!important; border: 0!important } table td.linenumber { width: 40px!important; } 
+        </style>
+      </head>
+      <body style="font-family: monospace;">
+        <ul class="nav nav-tabs">
+          <li>
+            <a href="#codegrid" data-toggle="tab">Codegrid</a>
+          </li>
+          <li>
+            <a href="#statementlist" data-toggle="tab">Statement List</a>
+          </li>
+        </ul>
+        <div class="tab-content">
+          <div class="tab-pane active" id="codegrid">
+            <pre style='font-size: 12pt; font-family: courier;'>1 <span style=''>package com.knoldus.datbasestudent
+</span>2 <span style=''>import java.sql._
+</span>3 <span style=''>import java.sql.DriverManager
+</span>4 <span style=''>import java.sql.Connection
+</span>5 <span style=''>import com.knoldus.datbasestudent._
+</span>6 <span style=''>/**
+</span>7 <span style=''>  * Created by knoldus on 13/2/16.
+</span>8 <span style=''>  */
+</span>9 <span style=''>class Student_Subject {
+</span>10 <span style=''>  def assignSubjects(name: String, studentId: Int, subjectList: List[String]): Boolean = {
+</span>11 <span style=''>    val obj = </span><span style='background: #AEF1AE'>new Student</span><span style=''>
+</span>12 <span style=''>    val idList = </span><span style='background: #AEF1AE'>obj.search(name)</span><span style=''>
+</span>13 <span style=''>    if (</span><span style='background: #AEF1AE'>idList contains studentId</span><span style=''>) </span><span style='background: #AEF1AE'>{
+</span>14 <span style=''></span><span style='background: #AEF1AE'>
+</span>15 <span style=''></span><span style='background: #AEF1AE'>      def pullSubjectId(subjectList: List[String], subjectIdList: List[Int]): List[Int] = {
+</span>16 <span style=''></span><span style='background: #AEF1AE'>
+</span>17 <span style=''></span><span style='background: #AEF1AE'>        val obj = new Subject
+</span>18 <span style=''></span><span style='background: #AEF1AE'>        subjectList match {
+</span>19 <span style=''></span><span style='background: #AEF1AE'>          case head :: tail => pullSubjectId(subjectList.tail, subjectIdList ::: List(obj.searchSubject(subjectList.head)))
+</span>20 <span style=''></span><span style='background: #AEF1AE'>          case Nil => subjectIdList
+</span>21 <span style=''></span><span style='background: #AEF1AE'>        }
+</span>22 <span style=''></span><span style='background: #AEF1AE'>      }
+</span>23 <span style=''></span><span style='background: #AEF1AE'>      val subjectIdList = pullSubjectId(subjectList, List())
+</span>24 <span style=''></span><span style='background: #AEF1AE'>      if (</span><span style='background: #F0ADAD'>!subjectIdList.isEmpty</span><span style='background: #AEF1AE'>) </span><span style='background: #F0ADAD'>{
+</span>25 <span style=''></span><span style='background: #F0ADAD'>        def insertSubject(subjectIdList: List[Int], conn: Connection, statement: Statement): Boolean = {
+</span>26 <span style=''></span><span style='background: #F0ADAD'>          subjectIdList match {
+</span>27 <span style=''></span><span style='background: #F0ADAD'>            case head :: tail => {
+</span>28 <span style=''></span><span style='background: #F0ADAD'>              val query = "insert into student_subject values ('" + studentId + "','" + subjectIdList.head + "' );"
+</span>29 <span style=''></span><span style='background: #F0ADAD'>              statement.executeUpdate(query)
+</span>30 <span style=''></span><span style='background: #F0ADAD'>              insertSubject(subjectIdList.tail, conn, statement)
+</span>31 <span style=''></span><span style='background: #F0ADAD'>            }
+</span>32 <span style=''></span><span style='background: #F0ADAD'>            case Nil => true
+</span>33 <span style=''></span><span style='background: #F0ADAD'>          }
+</span>34 <span style=''></span><span style='background: #F0ADAD'>        }
+</span>35 <span style=''></span><span style='background: #F0ADAD'>        val conn = DbConnection.connectDb()
+</span>36 <span style=''></span><span style='background: #F0ADAD'>        val statement = conn.createStatement()
+</span>37 <span style=''></span><span style='background: #F0ADAD'>        insertSubject(subjectIdList, conn, statement)
+</span>38 <span style=''></span><span style='background: #F0ADAD'>      }</span><span style='background: #AEF1AE'>
+</span>39 <span style=''></span><span style='background: #AEF1AE'>      else </span><span style='background: #F0ADAD'>false</span><span style='background: #AEF1AE'>
+</span>40 <span style=''></span><span style='background: #AEF1AE'>    }</span><span style=''>
+</span>41 <span style=''>    else </span><span style='background: #F0ADAD'>false</span><span style=''>
+</span>42 <span style=''>  }
+</span>43 <span style=''>
+</span>44 <span style=''>  def searchSubjectForStudent(stud_id: Int): List[String] = {
+</span>45 <span style=''>    val conn = </span><span style='background: #AEF1AE'>DbConnection.connectDb()</span><span style=''>
+</span>46 <span style=''>    val statement = </span><span style='background: #AEF1AE'>conn.createStatement()</span><span style=''>
+</span>47 <span style=''>    val query = </span><span style='background: #AEF1AE'>"select subject.subject, subject.id from subject inner join student_subject on subject.id=student_subject.sub_id where stud_id='" + stud_id + "' ;"</span><span style=''>
+</span>48 <span style=''>    val result = </span><span style='background: #AEF1AE'>statement.executeQuery(query)</span><span style=''>
+</span>49 <span style=''>    def store(result: ResultSet, list: List[String]): List[String] = {
+</span>50 <span style=''>      result match {
+</span>51 <span style=''>        case a if </span><span style='background: #AEF1AE'>!a.next</span><span style=''> => list
+</span>52 <span style=''>        case b => {
+</span>53 <span style=''>          val sub_name = </span><span style='background: #AEF1AE'>result.getString(1)</span><span style=''>
+</span>54 <span style=''>          </span><span style='background: #AEF1AE'>store(result, list ::: List(sub_name))</span><span style=''>
+</span>55 <span style=''>        }
+</span>56 <span style=''>      }
+</span>57 <span style=''>    }
+</span>58 <span style=''>    </span><span style='background: #AEF1AE'>store(result, List())</span><span style=''>
+</span>59 <span style=''>  }
+</span>60 <span style=''>
+</span>61 <span style=''>  def deleteAssignedSubject(studentName: String, studentId: Int, subjectName: String): Boolean = {
+</span>62 <span style=''>    val subjectId = (</span><span style='background: #AEF1AE'>new Subject).searchSubject(subjectName)</span><span style=''>
+</span>63 <span style=''>    if (</span><span style='background: #F0ADAD'>subjectId > 0</span><span style=''>) </span><span style='background: #F0ADAD'>{
+</span>64 <span style=''></span><span style='background: #F0ADAD'>      val conn = DbConnection.connectDb()
+</span>65 <span style=''></span><span style='background: #F0ADAD'>      val statement = conn.createStatement()
+</span>66 <span style=''></span><span style='background: #F0ADAD'>      val query = "delete from student_subject where stud_id = '" + studentId + "' and sub_id ='" + subjectId + "' ;"
+</span>67 <span style=''></span><span style='background: #F0ADAD'>      val exec = statement.executeUpdate(query)
+</span>68 <span style=''></span><span style='background: #F0ADAD'>      if (exec == 1) true
+</span>69 <span style=''></span><span style='background: #F0ADAD'>      else false
+</span>70 <span style=''></span><span style='background: #F0ADAD'>    }</span><span style=''>
+</span>71 <span style=''>    else </span><span style='background: #F0ADAD'>false</span><span style=''>
+</span>72 <span style=''>  }
+</span>73 <span style=''>}
+</span>74 <span style=''>
+</span>75 <span style=''>
+</span>76 <span style=''>object Student_Subject extends App{
+</span>77 <span style=''>  val obj= </span><span style='background: #F0ADAD'>new Student_Subject</span><span style=''>
+</span>78 <span style=''>  //println(obj.assignSubjects("Sonu Mehrotra",1,List("C Programming","C# Programming")))
+</span>79 <span style=''></span><span style='background: #F0ADAD'>println(obj.searchSubjectForStudent(1))</span><span style=''>
+</span>80 <span style=''></span><span style='background: #F0ADAD'>println(obj.deleteAssignedSubject("Sonu",1,"C# Programming"))</span><span style=''>
+</span>81 <span style=''>}
+</span></pre>
+          </div>
+          <div class="tab-pane" id="statementlist">
+            <table cellspacing="0" cellpadding="0" class="table statementlist">
+      <tr>
+        <th>Line</th>
+        <th>Stmt Id</th>
+        <th>Pos</th>
+        <th>Tree</th>
+        <th>Symbol</th>
+        <th>Code</th>
+      </tr><tr>
+        <td>
+          11
+        </td>
+        <td>
+          36
+        </td>
+        <td>
+          319
+          -
+          330
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          com.knoldus.datbasestudent.Student.&lt;init&gt;
+        </td>
+        <td style="background: #AEF1AE">
+          new Student()
+        </td>
+      </tr><tr>
+        <td>
+          12
+        </td>
+        <td>
+          37
+        </td>
+        <td>
+          348
+          -
+          364
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          com.knoldus.datbasestudent.Student.search
+        </td>
+        <td style="background: #AEF1AE">
+          obj.search(name)
+        </td>
+      </tr><tr>
+        <td>
+          13
+        </td>
+        <td>
+          38
+        </td>
+        <td>
+          373
+          -
+          398
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          scala.collection.LinearSeqOptimized.contains
+        </td>
+        <td style="background: #AEF1AE">
+          idList.contains[Int](studentId)
+        </td>
+      </tr><tr>
+        <td>
+          13
+        </td>
+        <td>
+          57
+        </td>
+        <td>
+          400
+          -
+          1467
+        </td>
+        <td>
+          Block
+        </td>
+        <td>
+          &lt;nosymbol&gt;
+        </td>
+        <td style="background: #AEF1AE">
+          {
+  def pullSubjectId(subjectList: List[String], subjectIdList: List[Int]): List[Int] = {
+    val obj: com.knoldus.datbasestudent.Subject = new Subject();
+    subjectList match {
+      case (head: String, tl: List[String])scala.collection.immutable.::[String]((head @ _), (tail @ _)) =&gt; pullSubjectId(subjectList.tail, {
+        &lt;synthetic&gt; &lt;artifact&gt; val x$1: List[Int] = subjectIdList;
+        immutable.this.List.apply[Int](obj.searchSubject(subjectList.head)).:::[Int](x$1)
+      })
+      case immutable.this.Nil =&gt; subjectIdList
+    }
+  };
+  val subjectIdList: List[Int] = pullSubjectId(subjectList, immutable.this.Nil);
+  if (subjectIdList.isEmpty.unary_!)
+    {
+      def insertSubject(subjectIdList: List[Int], conn: java.sql.Connection, statement: java.sql.Statement): Boolean = subjectIdList match {
+        case (head: Int, tl: List[Int])scala.collection.immutable.::[Int]((head @ _), (tail @ _)) =&gt; {
+          val query: String = &quot;insert into student_subject values (\'&quot;.+(studentId).+(&quot;\',\'&quot;).+(subjectIdList.head).+(&quot;\' );&quot;);
+          statement.executeUpdate(query);
+          insertSubject(subjectIdList.tail, conn, statement)
+        }
+        case immutable.this.Nil =&gt; true
+      };
+      val conn: java.sql.Connection = DbConnection.connectDb();
+      val statement: java.sql.Statement = conn.createStatement();
+      insertSubject(subjectIdList, conn, statement)
+    }
+  else
+    false
+}
+        </td>
+      </tr><tr>
+        <td>
+          17
+        </td>
+        <td>
+          39
+        </td>
+        <td>
+          514
+          -
+          525
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          com.knoldus.datbasestudent.Subject.&lt;init&gt;
+        </td>
+        <td style="background: #AEF1AE">
+          new Subject()
+        </td>
+      </tr><tr>
+        <td>
+          19
+        </td>
+        <td>
+          41
+        </td>
+        <td>
+          631
+          -
+          676
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          scala.collection.immutable.List.:::
+        </td>
+        <td style="background: #AEF1AE">
+          immutable.this.List.apply[Int](obj.searchSubject(subjectList.head)).:::[Int](x$1)
+        </td>
+      </tr><tr>
+        <td>
+          19
+        </td>
+        <td>
+          40
+        </td>
+        <td>
+          599
+          -
+          615
+        </td>
+        <td>
+          Select
+        </td>
+        <td>
+          scala.collection.TraversableLike.tail
+        </td>
+        <td style="background: #AEF1AE">
+          subjectList.tail
+        </td>
+      </tr><tr>
+        <td>
+          19
+        </td>
+        <td>
+          42
+        </td>
+        <td>
+          585
+          -
+          677
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          com.knoldus.datbasestudent.Student_Subject.pullSubjectId
+        </td>
+        <td style="background: #AEF1AE">
+          pullSubjectId(subjectList.tail, {
+  &lt;synthetic&gt; &lt;artifact&gt; val x$1: List[Int] = subjectIdList;
+  immutable.this.List.apply[Int](obj.searchSubject(subjectList.head)).:::[Int](x$1)
+})
+        </td>
+      </tr><tr>
+        <td>
+          23
+        </td>
+        <td>
+          44
+        </td>
+        <td>
+          758
+          -
+          792
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          com.knoldus.datbasestudent.Student_Subject.pullSubjectId
+        </td>
+        <td style="background: #AEF1AE">
+          pullSubjectId(subjectList, immutable.this.Nil)
+        </td>
+      </tr><tr>
+        <td>
+          23
+        </td>
+        <td>
+          43
+        </td>
+        <td>
+          785
+          -
+          791
+        </td>
+        <td>
+          Select
+        </td>
+        <td>
+          scala.collection.immutable.Nil
+        </td>
+        <td style="background: #AEF1AE">
+          immutable.this.Nil
+        </td>
+      </tr><tr>
+        <td>
+          24
+        </td>
+        <td>
+          45
+        </td>
+        <td>
+          803
+          -
+          825
+        </td>
+        <td>
+          Select
+        </td>
+        <td>
+          scala.Boolean.unary_!
+        </td>
+        <td style="background: #F0ADAD">
+          subjectIdList.isEmpty.unary_!
+        </td>
+      </tr><tr>
+        <td>
+          24
+        </td>
+        <td>
+          54
+        </td>
+        <td>
+          827
+          -
+          1444
+        </td>
+        <td>
+          Block
+        </td>
+        <td>
+          &lt;nosymbol&gt;
+        </td>
+        <td style="background: #F0ADAD">
+          {
+  def insertSubject(subjectIdList: List[Int], conn: java.sql.Connection, statement: java.sql.Statement): Boolean = subjectIdList match {
+    case (head: Int, tl: List[Int])scala.collection.immutable.::[Int]((head @ _), (tail @ _)) =&gt; {
+      val query: String = &quot;insert into student_subject values (\'&quot;.+(studentId).+(&quot;\',\'&quot;).+(subjectIdList.head).+(&quot;\' );&quot;);
+      statement.executeUpdate(query);
+      insertSubject(subjectIdList.tail, conn, statement)
+    }
+    case immutable.this.Nil =&gt; true
+  };
+  val conn: java.sql.Connection = DbConnection.connectDb();
+  val statement: java.sql.Statement = conn.createStatement();
+  insertSubject(subjectIdList, conn, statement)
+}
+        </td>
+      </tr><tr>
+        <td>
+          28
+        </td>
+        <td>
+          46
+        </td>
+        <td>
+          1027
+          -
+          1116
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          java.lang.String.+
+        </td>
+        <td style="background: #F0ADAD">
+          &quot;insert into student_subject values (\'&quot;.+(studentId).+(&quot;\',\'&quot;).+(subjectIdList.head).+(&quot;\' );&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          29
+        </td>
+        <td>
+          47
+        </td>
+        <td>
+          1131
+          -
+          1161
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          java.sql.Statement.executeUpdate
+        </td>
+        <td style="background: #F0ADAD">
+          statement.executeUpdate(query)
+        </td>
+      </tr><tr>
+        <td>
+          30
+        </td>
+        <td>
+          49
+        </td>
+        <td>
+          1176
+          -
+          1226
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          com.knoldus.datbasestudent.Student_Subject.insertSubject
+        </td>
+        <td style="background: #F0ADAD">
+          insertSubject(subjectIdList.tail, conn, statement)
+        </td>
+      </tr><tr>
+        <td>
+          30
+        </td>
+        <td>
+          48
+        </td>
+        <td>
+          1190
+          -
+          1208
+        </td>
+        <td>
+          Select
+        </td>
+        <td>
+          scala.collection.TraversableLike.tail
+        </td>
+        <td style="background: #F0ADAD">
+          subjectIdList.tail
+        </td>
+      </tr><tr>
+        <td>
+          32
+        </td>
+        <td>
+          50
+        </td>
+        <td>
+          1265
+          -
+          1269
+        </td>
+        <td>
+          Literal
+        </td>
+        <td>
+          &lt;nosymbol&gt;
+        </td>
+        <td style="background: #F0ADAD">
+          true
+        </td>
+      </tr><tr>
+        <td>
+          35
+        </td>
+        <td>
+          51
+        </td>
+        <td>
+          1311
+          -
+          1335
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          com.knoldus.datbasestudent.DbConnection.connectDb
+        </td>
+        <td style="background: #F0ADAD">
+          DbConnection.connectDb()
+        </td>
+      </tr><tr>
+        <td>
+          36
+        </td>
+        <td>
+          52
+        </td>
+        <td>
+          1360
+          -
+          1382
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          java.sql.Connection.createStatement
+        </td>
+        <td style="background: #F0ADAD">
+          conn.createStatement()
+        </td>
+      </tr><tr>
+        <td>
+          37
+        </td>
+        <td>
+          53
+        </td>
+        <td>
+          1391
+          -
+          1436
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          com.knoldus.datbasestudent.Student_Subject.insertSubject
+        </td>
+        <td style="background: #F0ADAD">
+          insertSubject(subjectIdList, conn, statement)
+        </td>
+      </tr><tr>
+        <td>
+          39
+        </td>
+        <td>
+          56
+        </td>
+        <td>
+          1456
+          -
+          1461
+        </td>
+        <td>
+          Block
+        </td>
+        <td>
+          &lt;nosymbol&gt;
+        </td>
+        <td style="background: #F0ADAD">
+          false
+        </td>
+      </tr><tr>
+        <td>
+          39
+        </td>
+        <td>
+          55
+        </td>
+        <td>
+          1456
+          -
+          1461
+        </td>
+        <td>
+          Literal
+        </td>
+        <td>
+          &lt;nosymbol&gt;
+        </td>
+        <td style="background: #F0ADAD">
+          false
+        </td>
+      </tr><tr>
+        <td>
+          41
+        </td>
+        <td>
+          59
+        </td>
+        <td>
+          1477
+          -
+          1482
+        </td>
+        <td>
+          Block
+        </td>
+        <td>
+          &lt;nosymbol&gt;
+        </td>
+        <td style="background: #F0ADAD">
+          false
+        </td>
+      </tr><tr>
+        <td>
+          41
+        </td>
+        <td>
+          58
+        </td>
+        <td>
+          1477
+          -
+          1482
+        </td>
+        <td>
+          Literal
+        </td>
+        <td>
+          &lt;nosymbol&gt;
+        </td>
+        <td style="background: #F0ADAD">
+          false
+        </td>
+      </tr><tr>
+        <td>
+          45
+        </td>
+        <td>
+          60
+        </td>
+        <td>
+          1565
+          -
+          1589
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          com.knoldus.datbasestudent.DbConnection.connectDb
+        </td>
+        <td style="background: #AEF1AE">
+          DbConnection.connectDb()
+        </td>
+      </tr><tr>
+        <td>
+          46
+        </td>
+        <td>
+          61
+        </td>
+        <td>
+          1610
+          -
+          1632
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          java.sql.Connection.createStatement
+        </td>
+        <td style="background: #AEF1AE">
+          conn.createStatement()
+        </td>
+      </tr><tr>
+        <td>
+          47
+        </td>
+        <td>
+          62
+        </td>
+        <td>
+          1649
+          -
+          1796
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          java.lang.String.+
+        </td>
+        <td style="background: #AEF1AE">
+          &quot;select subject.subject, subject.id from subject inner join student_subject on subject.id=student_subject.sub_id where stud_id=\'&quot;.+(stud_id).+(&quot;\' ;&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          48
+        </td>
+        <td>
+          63
+        </td>
+        <td>
+          1814
+          -
+          1843
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          java.sql.Statement.executeQuery
+        </td>
+        <td style="background: #AEF1AE">
+          statement.executeQuery(query)
+        </td>
+      </tr><tr>
+        <td>
+          51
+        </td>
+        <td>
+          64
+        </td>
+        <td>
+          1954
+          -
+          1961
+        </td>
+        <td>
+          Select
+        </td>
+        <td>
+          scala.Boolean.unary_!
+        </td>
+        <td style="background: #AEF1AE">
+          a.next().unary_!
+        </td>
+      </tr><tr>
+        <td>
+          53
+        </td>
+        <td>
+          65
+        </td>
+        <td>
+          2015
+          -
+          2034
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          java.sql.ResultSet.getString
+        </td>
+        <td style="background: #AEF1AE">
+          result.getString(1)
+        </td>
+      </tr><tr>
+        <td>
+          54
+        </td>
+        <td>
+          67
+        </td>
+        <td>
+          2045
+          -
+          2083
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          com.knoldus.datbasestudent.Student_Subject.store
+        </td>
+        <td style="background: #AEF1AE">
+          store(result, {
+  &lt;synthetic&gt; &lt;artifact&gt; val x$2: List[String] = list;
+  immutable.this.List.apply[String](sub_name).:::[String](x$2)
+})
+        </td>
+      </tr><tr>
+        <td>
+          54
+        </td>
+        <td>
+          66
+        </td>
+        <td>
+          2064
+          -
+          2082
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          scala.collection.immutable.List.:::
+        </td>
+        <td style="background: #AEF1AE">
+          immutable.this.List.apply[String](sub_name).:::[String](x$2)
+        </td>
+      </tr><tr>
+        <td>
+          58
+        </td>
+        <td>
+          68
+        </td>
+        <td>
+          2126
+          -
+          2132
+        </td>
+        <td>
+          Select
+        </td>
+        <td>
+          scala.collection.immutable.Nil
+        </td>
+        <td style="background: #AEF1AE">
+          immutable.this.Nil
+        </td>
+      </tr><tr>
+        <td>
+          58
+        </td>
+        <td>
+          69
+        </td>
+        <td>
+          2112
+          -
+          2133
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          com.knoldus.datbasestudent.Student_Subject.store
+        </td>
+        <td style="background: #AEF1AE">
+          store(result, immutable.this.Nil)
+        </td>
+      </tr><tr>
+        <td>
+          62
+        </td>
+        <td>
+          70
+        </td>
+        <td>
+          2259
+          -
+          2298
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          com.knoldus.datbasestudent.Subject.searchSubject
+        </td>
+        <td style="background: #AEF1AE">
+          new Subject().searchSubject(subjectName)
+        </td>
+      </tr><tr>
+        <td>
+          63
+        </td>
+        <td>
+          71
+        </td>
+        <td>
+          2307
+          -
+          2320
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          scala.Int.&gt;
+        </td>
+        <td style="background: #F0ADAD">
+          subjectId.&gt;(0)
+        </td>
+      </tr><tr>
+        <td>
+          63
+        </td>
+        <td>
+          81
+        </td>
+        <td>
+          2322
+          -
+          2625
+        </td>
+        <td>
+          Block
+        </td>
+        <td>
+          &lt;nosymbol&gt;
+        </td>
+        <td style="background: #F0ADAD">
+          {
+  val conn: java.sql.Connection = DbConnection.connectDb();
+  val statement: java.sql.Statement = conn.createStatement();
+  val query: String = &quot;delete from student_subject where stud_id = \'&quot;.+(studentId).+(&quot;\' and sub_id =\'&quot;).+(subjectId).+(&quot;\' ;&quot;);
+  val exec: Int = statement.executeUpdate(query);
+  if (exec.==(1))
+    true
+  else
+    false
+}
+        </td>
+      </tr><tr>
+        <td>
+          64
+        </td>
+        <td>
+          72
+        </td>
+        <td>
+          2341
+          -
+          2365
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          com.knoldus.datbasestudent.DbConnection.connectDb
+        </td>
+        <td style="background: #F0ADAD">
+          DbConnection.connectDb()
+        </td>
+      </tr><tr>
+        <td>
+          65
+        </td>
+        <td>
+          73
+        </td>
+        <td>
+          2388
+          -
+          2410
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          java.sql.Connection.createStatement
+        </td>
+        <td style="background: #F0ADAD">
+          conn.createStatement()
+        </td>
+      </tr><tr>
+        <td>
+          66
+        </td>
+        <td>
+          74
+        </td>
+        <td>
+          2429
+          -
+          2528
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          java.lang.String.+
+        </td>
+        <td style="background: #F0ADAD">
+          &quot;delete from student_subject where stud_id = \'&quot;.+(studentId).+(&quot;\' and sub_id =\'&quot;).+(subjectId).+(&quot;\' ;&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          67
+        </td>
+        <td>
+          75
+        </td>
+        <td>
+          2546
+          -
+          2576
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          java.sql.Statement.executeUpdate
+        </td>
+        <td style="background: #F0ADAD">
+          statement.executeUpdate(query)
+        </td>
+      </tr><tr>
+        <td>
+          68
+        </td>
+        <td>
+          77
+        </td>
+        <td>
+          2598
+          -
+          2602
+        </td>
+        <td>
+          Literal
+        </td>
+        <td>
+          &lt;nosymbol&gt;
+        </td>
+        <td style="background: #F0ADAD">
+          true
+        </td>
+      </tr><tr>
+        <td>
+          68
+        </td>
+        <td>
+          76
+        </td>
+        <td>
+          2587
+          -
+          2596
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          scala.Int.==
+        </td>
+        <td style="background: #F0ADAD">
+          exec.==(1)
+        </td>
+      </tr><tr>
+        <td>
+          68
+        </td>
+        <td>
+          78
+        </td>
+        <td>
+          2598
+          -
+          2602
+        </td>
+        <td>
+          Block
+        </td>
+        <td>
+          &lt;nosymbol&gt;
+        </td>
+        <td style="background: #F0ADAD">
+          true
+        </td>
+      </tr><tr>
+        <td>
+          69
+        </td>
+        <td>
+          80
+        </td>
+        <td>
+          2614
+          -
+          2619
+        </td>
+        <td>
+          Block
+        </td>
+        <td>
+          &lt;nosymbol&gt;
+        </td>
+        <td style="background: #F0ADAD">
+          false
+        </td>
+      </tr><tr>
+        <td>
+          69
+        </td>
+        <td>
+          79
+        </td>
+        <td>
+          2614
+          -
+          2619
+        </td>
+        <td>
+          Literal
+        </td>
+        <td>
+          &lt;nosymbol&gt;
+        </td>
+        <td style="background: #F0ADAD">
+          false
+        </td>
+      </tr><tr>
+        <td>
+          71
+        </td>
+        <td>
+          83
+        </td>
+        <td>
+          2635
+          -
+          2640
+        </td>
+        <td>
+          Block
+        </td>
+        <td>
+          &lt;nosymbol&gt;
+        </td>
+        <td style="background: #F0ADAD">
+          false
+        </td>
+      </tr><tr>
+        <td>
+          71
+        </td>
+        <td>
+          82
+        </td>
+        <td>
+          2635
+          -
+          2640
+        </td>
+        <td>
+          Literal
+        </td>
+        <td>
+          &lt;nosymbol&gt;
+        </td>
+        <td style="background: #F0ADAD">
+          false
+        </td>
+      </tr><tr>
+        <td>
+          77
+        </td>
+        <td>
+          84
+        </td>
+        <td>
+          2696
+          -
+          2715
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          com.knoldus.datbasestudent.Student_Subject.&lt;init&gt;
+        </td>
+        <td style="background: #F0ADAD">
+          new Student_Subject()
+        </td>
+      </tr><tr>
+        <td>
+          79
+        </td>
+        <td>
+          86
+        </td>
+        <td>
+          2806
+          -
+          2845
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          scala.Predef.println
+        </td>
+        <td style="background: #F0ADAD">
+          scala.this.Predef.println(Student_Subject.this.obj.searchSubjectForStudent(1))
+        </td>
+      </tr><tr>
+        <td>
+          79
+        </td>
+        <td>
+          85
+        </td>
+        <td>
+          2814
+          -
+          2844
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          com.knoldus.datbasestudent.Student_Subject.searchSubjectForStudent
+        </td>
+        <td style="background: #F0ADAD">
+          Student_Subject.this.obj.searchSubjectForStudent(1)
+        </td>
+      </tr><tr>
+        <td>
+          80
+        </td>
+        <td>
+          88
+        </td>
+        <td>
+          2846
+          -
+          2907
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          scala.Predef.println
+        </td>
+        <td style="background: #F0ADAD">
+          scala.this.Predef.println(Student_Subject.this.obj.deleteAssignedSubject(&quot;Sonu&quot;, 1, &quot;C# Programming&quot;))
+        </td>
+      </tr><tr>
+        <td>
+          80
+        </td>
+        <td>
+          87
+        </td>
+        <td>
+          2854
+          -
+          2906
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          com.knoldus.datbasestudent.Student_Subject.deleteAssignedSubject
+        </td>
+        <td style="background: #F0ADAD">
+          Student_Subject.this.obj.deleteAssignedSubject(&quot;Sonu&quot;, 1, &quot;C# Programming&quot;)
+        </td>
+      </tr>
+    </table>
+          </div>
+        </div>
+      </body>
+    </html>

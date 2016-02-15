@@ -1,0 +1,638 @@
+<html>
+      <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+        <title id="title">
+          com/knoldus/datbasestudent/Student.scala.html
+        </title>
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.20.1/css/theme.default.min.css" type="text/css"/><script src="http://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.20.1/js/jquery.tablesorter.min.js"></script><link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css" type="text/css"/><script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"></script><script type="text/javascript">
+        $(document).ready(function() {$(".tablesorter").tablesorter();});
+      </script>
+        <style>
+          table.codegrid { font-family: monospace; font-size: 12px; width: auto!important; }table.statementlist { width: auto!important; font-size: 13px; } table.codegrid td { padding: 0!important; border: 0!important } table td.linenumber { width: 40px!important; } 
+        </style>
+      </head>
+      <body style="font-family: monospace;">
+        <ul class="nav nav-tabs">
+          <li>
+            <a href="#codegrid" data-toggle="tab">Codegrid</a>
+          </li>
+          <li>
+            <a href="#statementlist" data-toggle="tab">Statement List</a>
+          </li>
+        </ul>
+        <div class="tab-content">
+          <div class="tab-pane active" id="codegrid">
+            <pre style='font-size: 12pt; font-family: courier;'>1 <span style=''>package com.knoldus.datbasestudent
+</span>2 <span style=''>import java.sql.{PreparedStatement, ResultSet}
+</span>3 <span style=''>
+</span>4 <span style=''>/**
+</span>5 <span style=''>  * Created by knoldus on 13/2/16.
+</span>6 <span style=''>  */
+</span>7 <span style=''>class Student {
+</span>8 <span style=''>  def search(name: String): List[Int] = {
+</span>9 <span style=''>    val conn = </span><span style='background: #AEF1AE'>DbConnection.connectDb()</span><span style=''>
+</span>10 <span style=''>    val statement = </span><span style='background: #AEF1AE'>conn.createStatement()</span><span style=''>
+</span>11 <span style=''>    val result = </span><span style='background: #AEF1AE'>statement.executeQuery("SELECT id FROM student WHERE name='" + name + "';")</span><span style=''>
+</span>12 <span style=''>    def store(result: ResultSet, list: List[Int]): List[Int] = {
+</span>13 <span style=''>      result match {
+</span>14 <span style=''>        case a if </span><span style='background: #AEF1AE'>!a.next</span><span style=''> => list
+</span>15 <span style=''>        case b => {
+</span>16 <span style=''>          val id = </span><span style='background: #AEF1AE'>result.getInt(1)</span><span style=''>
+</span>17 <span style=''>          </span><span style='background: #AEF1AE'>store(result, list ::: List(id))</span><span style=''>
+</span>18 <span style=''>        }
+</span>19 <span style=''>      }
+</span>20 <span style=''>    }
+</span>21 <span style=''>    </span><span style='background: #AEF1AE'>store(result, List())</span><span style=''>
+</span>22 <span style=''>  }
+</span>23 <span style=''>
+</span>24 <span style=''>  def insert(id:Int,name:String,email:String,mobile:Int):Boolean={
+</span>25 <span style=''>    val conn = </span><span style='background: #AEF1AE'>DbConnection.connectDb()</span><span style=''>
+</span>26 <span style=''>    val query = </span><span style='background: #AEF1AE'>"insert into student (id,name,email,mobile) values (?,?,?,?);"</span><span style=''>
+</span>27 <span style=''>    val statement:PreparedStatement= </span><span style='background: #AEF1AE'>conn.prepareStatement(query)</span><span style=''>
+</span>28 <span style=''>    </span><span style='background: #AEF1AE'>statement.setInt(1,id)</span><span style=''>
+</span>29 <span style=''>    </span><span style='background: #AEF1AE'>statement.setString(2,name)</span><span style=''>
+</span>30 <span style=''>    </span><span style='background: #AEF1AE'>statement.setString(3,email)</span><span style=''>
+</span>31 <span style=''>    </span><span style='background: #AEF1AE'>statement.setInt(4,mobile)</span><span style=''>
+</span>32 <span style=''>    </span><span style='background: #AEF1AE'>statement.execute()</span><span style=''>
+</span>33 <span style=''>  }
+</span>34 <span style=''>
+</span>35 <span style=''>  def updateName(id:Int,newname:String):Int={
+</span>36 <span style=''>    val conn = </span><span style='background: #AEF1AE'>DbConnection.connectDb()</span><span style=''>
+</span>37 <span style=''>    val statement = </span><span style='background: #AEF1AE'>conn.createStatement()</span><span style=''>
+</span>38 <span style=''>    val query= </span><span style='background: #AEF1AE'>"update student set name = '"+newname+"' where id = '"+id+"' ;"</span><span style=''>
+</span>39 <span style=''>    </span><span style='background: #AEF1AE'>statement.executeUpdate(query)</span><span style=''>
+</span>40 <span style=''>  }
+</span>41 <span style=''>
+</span>42 <span style=''>  def deleteStudent(id:Int):Int={
+</span>43 <span style=''>    val conn = </span><span style='background: #AEF1AE'>DbConnection.connectDb()</span><span style=''>
+</span>44 <span style=''>    val statement = </span><span style='background: #AEF1AE'>conn.createStatement()</span><span style=''>
+</span>45 <span style=''>    val query= </span><span style='background: #AEF1AE'>"delete from student where id = '"+id+"' ;"</span><span style=''>
+</span>46 <span style=''>    </span><span style='background: #AEF1AE'>statement.executeUpdate(query)</span><span style=''>
+</span>47 <span style=''>  }
+</span>48 <span style=''>}
+</span></pre>
+          </div>
+          <div class="tab-pane" id="statementlist">
+            <table cellspacing="0" cellpadding="0" class="table statementlist">
+      <tr>
+        <th>Line</th>
+        <th>Stmt Id</th>
+        <th>Pos</th>
+        <th>Tree</th>
+        <th>Symbol</th>
+        <th>Code</th>
+      </tr><tr>
+        <td>
+          9
+        </td>
+        <td>
+          10
+        </td>
+        <td>
+          200
+          -
+          224
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          com.knoldus.datbasestudent.DbConnection.connectDb
+        </td>
+        <td style="background: #AEF1AE">
+          DbConnection.connectDb()
+        </td>
+      </tr><tr>
+        <td>
+          10
+        </td>
+        <td>
+          11
+        </td>
+        <td>
+          245
+          -
+          267
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          java.sql.Connection.createStatement
+        </td>
+        <td style="background: #AEF1AE">
+          conn.createStatement()
+        </td>
+      </tr><tr>
+        <td>
+          11
+        </td>
+        <td>
+          13
+        </td>
+        <td>
+          285
+          -
+          360
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          java.sql.Statement.executeQuery
+        </td>
+        <td style="background: #AEF1AE">
+          statement.executeQuery(&quot;SELECT id FROM student WHERE name=\'&quot;.+(name).+(&quot;\';&quot;))
+        </td>
+      </tr><tr>
+        <td>
+          11
+        </td>
+        <td>
+          12
+        </td>
+        <td>
+          308
+          -
+          359
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          java.lang.String.+
+        </td>
+        <td style="background: #AEF1AE">
+          &quot;SELECT id FROM student WHERE name=\'&quot;.+(name).+(&quot;\';&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          14
+        </td>
+        <td>
+          14
+        </td>
+        <td>
+          465
+          -
+          472
+        </td>
+        <td>
+          Select
+        </td>
+        <td>
+          scala.Boolean.unary_!
+        </td>
+        <td style="background: #AEF1AE">
+          a.next().unary_!
+        </td>
+      </tr><tr>
+        <td>
+          16
+        </td>
+        <td>
+          15
+        </td>
+        <td>
+          520
+          -
+          536
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          java.sql.ResultSet.getInt
+        </td>
+        <td style="background: #AEF1AE">
+          result.getInt(1)
+        </td>
+      </tr><tr>
+        <td>
+          17
+        </td>
+        <td>
+          17
+        </td>
+        <td>
+          547
+          -
+          579
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          com.knoldus.datbasestudent.Student.store
+        </td>
+        <td style="background: #AEF1AE">
+          store(result, {
+  &lt;synthetic&gt; &lt;artifact&gt; val x$1: List[Int] = list;
+  immutable.this.List.apply[Int](id).:::[Int](x$1)
+})
+        </td>
+      </tr><tr>
+        <td>
+          17
+        </td>
+        <td>
+          16
+        </td>
+        <td>
+          566
+          -
+          578
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          scala.collection.immutable.List.:::
+        </td>
+        <td style="background: #AEF1AE">
+          immutable.this.List.apply[Int](id).:::[Int](x$1)
+        </td>
+      </tr><tr>
+        <td>
+          21
+        </td>
+        <td>
+          19
+        </td>
+        <td>
+          608
+          -
+          629
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          com.knoldus.datbasestudent.Student.store
+        </td>
+        <td style="background: #AEF1AE">
+          store(result, immutable.this.Nil)
+        </td>
+      </tr><tr>
+        <td>
+          21
+        </td>
+        <td>
+          18
+        </td>
+        <td>
+          622
+          -
+          628
+        </td>
+        <td>
+          Select
+        </td>
+        <td>
+          scala.collection.immutable.Nil
+        </td>
+        <td style="background: #AEF1AE">
+          immutable.this.Nil
+        </td>
+      </tr><tr>
+        <td>
+          25
+        </td>
+        <td>
+          20
+        </td>
+        <td>
+          717
+          -
+          741
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          com.knoldus.datbasestudent.DbConnection.connectDb
+        </td>
+        <td style="background: #AEF1AE">
+          DbConnection.connectDb()
+        </td>
+      </tr><tr>
+        <td>
+          26
+        </td>
+        <td>
+          21
+        </td>
+        <td>
+          758
+          -
+          820
+        </td>
+        <td>
+          Literal
+        </td>
+        <td>
+          &lt;nosymbol&gt;
+        </td>
+        <td style="background: #AEF1AE">
+          &quot;insert into student (id,name,email,mobile) values (?,?,?,?);&quot;
+        </td>
+      </tr><tr>
+        <td>
+          27
+        </td>
+        <td>
+          22
+        </td>
+        <td>
+          858
+          -
+          886
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          java.sql.Connection.prepareStatement
+        </td>
+        <td style="background: #AEF1AE">
+          conn.prepareStatement(query)
+        </td>
+      </tr><tr>
+        <td>
+          28
+        </td>
+        <td>
+          23
+        </td>
+        <td>
+          891
+          -
+          913
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          java.sql.PreparedStatement.setInt
+        </td>
+        <td style="background: #AEF1AE">
+          statement.setInt(1, id)
+        </td>
+      </tr><tr>
+        <td>
+          29
+        </td>
+        <td>
+          24
+        </td>
+        <td>
+          918
+          -
+          945
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          java.sql.PreparedStatement.setString
+        </td>
+        <td style="background: #AEF1AE">
+          statement.setString(2, name)
+        </td>
+      </tr><tr>
+        <td>
+          30
+        </td>
+        <td>
+          25
+        </td>
+        <td>
+          950
+          -
+          978
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          java.sql.PreparedStatement.setString
+        </td>
+        <td style="background: #AEF1AE">
+          statement.setString(3, email)
+        </td>
+      </tr><tr>
+        <td>
+          31
+        </td>
+        <td>
+          26
+        </td>
+        <td>
+          983
+          -
+          1009
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          java.sql.PreparedStatement.setInt
+        </td>
+        <td style="background: #AEF1AE">
+          statement.setInt(4, mobile)
+        </td>
+      </tr><tr>
+        <td>
+          32
+        </td>
+        <td>
+          27
+        </td>
+        <td>
+          1014
+          -
+          1033
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          java.sql.PreparedStatement.execute
+        </td>
+        <td style="background: #AEF1AE">
+          statement.execute()
+        </td>
+      </tr><tr>
+        <td>
+          36
+        </td>
+        <td>
+          28
+        </td>
+        <td>
+          1100
+          -
+          1124
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          com.knoldus.datbasestudent.DbConnection.connectDb
+        </td>
+        <td style="background: #AEF1AE">
+          DbConnection.connectDb()
+        </td>
+      </tr><tr>
+        <td>
+          37
+        </td>
+        <td>
+          29
+        </td>
+        <td>
+          1145
+          -
+          1167
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          java.sql.Connection.createStatement
+        </td>
+        <td style="background: #AEF1AE">
+          conn.createStatement()
+        </td>
+      </tr><tr>
+        <td>
+          38
+        </td>
+        <td>
+          30
+        </td>
+        <td>
+          1183
+          -
+          1246
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          java.lang.String.+
+        </td>
+        <td style="background: #AEF1AE">
+          &quot;update student set name = \'&quot;.+(newname).+(&quot;\' where id = \'&quot;).+(id).+(&quot;\' ;&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          39
+        </td>
+        <td>
+          31
+        </td>
+        <td>
+          1251
+          -
+          1281
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          java.sql.Statement.executeUpdate
+        </td>
+        <td style="background: #AEF1AE">
+          statement.executeUpdate(query)
+        </td>
+      </tr><tr>
+        <td>
+          43
+        </td>
+        <td>
+          32
+        </td>
+        <td>
+          1336
+          -
+          1360
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          com.knoldus.datbasestudent.DbConnection.connectDb
+        </td>
+        <td style="background: #AEF1AE">
+          DbConnection.connectDb()
+        </td>
+      </tr><tr>
+        <td>
+          44
+        </td>
+        <td>
+          33
+        </td>
+        <td>
+          1381
+          -
+          1403
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          java.sql.Connection.createStatement
+        </td>
+        <td style="background: #AEF1AE">
+          conn.createStatement()
+        </td>
+      </tr><tr>
+        <td>
+          45
+        </td>
+        <td>
+          34
+        </td>
+        <td>
+          1419
+          -
+          1462
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          java.lang.String.+
+        </td>
+        <td style="background: #AEF1AE">
+          &quot;delete from student where id = \'&quot;.+(id).+(&quot;\' ;&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          46
+        </td>
+        <td>
+          35
+        </td>
+        <td>
+          1467
+          -
+          1497
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          java.sql.Statement.executeUpdate
+        </td>
+        <td style="background: #AEF1AE">
+          statement.executeUpdate(query)
+        </td>
+      </tr>
+    </table>
+          </div>
+        </div>
+      </body>
+    </html>
